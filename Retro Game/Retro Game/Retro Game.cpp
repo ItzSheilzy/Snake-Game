@@ -2,9 +2,11 @@
 #include <conio.h>
 #include <windows.h>
 #include <cstdlib>
+#include <string>
+
 using namespace std;
 
-
+// Gameover Boolian
 bool GameOver;
 
 // world border size 
@@ -12,11 +14,24 @@ const int width = 40;
 const int height = 20;
 
 // x,y and score ints of the Snake and Fruit
-int x, y, fruitX, fruitY, score;
+int x, y, fruitX, fruitY, score , fruits;
 
 // Tail ints
 int tailX[100], tailY[100];
 int nTail;
+
+//User Inputs there are more then 2 so the code doesn't break and mess up the game 
+string input1 = " ";
+string input2 = " ";
+
+
+//Colours to make the game look pretty
+const char* MAGENTA = "\x1b[95m";
+const char* RED = "\x1b[91m";
+const char* GREEN = "\x1b[92m";
+const char* YELLOW = "\x1b[93m";
+const char* WHITE = "\x1b[97m";
+const char* RESET_COLOR = "\x1b[0m";
 
 
 enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN,};
@@ -33,36 +48,36 @@ void setup()
     fruitX = rand() % width;
     fruitY = rand() % height;
     score = 0;
+    fruits = 0;
 }
 
 
 // Draw function
 void Draw()
 {
-    // system clears the old map to update and the snake to move around
-    system("Cls"); 
-
     // Top of the map
-    for (int i = 0; i < width; i++)
-        cout << "#";
+    for (int i = 0; i < width + 1; i++)
+    {
+        cout << RED << "#";
+    } 
     cout << endl;
 
-    // 2D array the prints the world border aswell as the snake head and fruit inside the border map
+    // Array the prints the world border aswell as the snake head and fruit inside the border map
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
             if (j == 0 || j == width - 1)
             {
-                cout << "#"; // World border
+                cout << RED << "#"; // World border
             }
             if(i == y && j == x)
             {
-                cout << "O"; // Snake head
+                cout << GREEN << "O"; // Snake head
             }
             else if (i == fruitY && j == fruitX)
             {
-                cout << "F"; // Fruit
+                cout << WHITE << "F"; // Fruit
             }
             // prints the body if the snake on the back of the snake head
             else
@@ -73,25 +88,37 @@ void Draw()
                     
                     if (tailX[k] == j && tailY[k] == i)
                     {
-                        cout << "o"; 
+                        cout << GREEN << "o"; 
                         print = true;
                     }
                 } 
                 // printing blank spaces in the sized map
                 if (!print)
                     cout << " ";
+                
             }
         }
         cout << endl;
     }
     // bottom of the map
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < width + 1; i++)
     {
-        cout << "#";
+        cout << RED << "#";
     }
-    cout << endl;
+    cout << RESET_COLOR << endl;
     // Score display
-    cout << "score: " << score << endl;
+    cout << "Score: " << score << endl;
+    cout << "Fruits collected: " << fruits << endl;
+}
+
+
+// makes the frames not flicker when you open the the game
+void UpdateFrame()
+{
+    COORD cursorPosition;	
+    cursorPosition.X = 0;	
+    cursorPosition.Y = 0;	
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
 
 
@@ -112,17 +139,35 @@ void Input()
             dir = UP;
             break;
         case 's':
-            dir = DOWN;
-            break;
-        case 'q':
-            cout << "Game quit." << endl;
-            GameOver = true;          
+           dir = DOWN;
             break;
         case 'p':
+            system("cls");
             cout << "Game Paused." << endl;
-            system("Pause");
-            break;
-        }    
+            cout << "Score: " << score << endl;
+            cout << "Fruits: " << fruits << endl;
+            cout << "Would you like to Continue 'Y'/'N'" << endl;
+            cin >> input1;
+            system("cls");
+            if (input1 == "Y" || input1 == "y")
+            {
+                GameOver = false;
+            }
+            else if (input1 == "N" || input1 == "n")
+            {
+                cout << "Game Quit." << endl;
+                cout << "Final Scores: " << score << endl;
+                cout << "Final Fruits: " << fruits << endl;
+                GameOver = true;
+            }
+            else
+            {
+                cout << "Invalid Command." << endl;
+                system("pause");
+                system("cls");
+            }
+            break;      
+        } 
     }
 }
 
@@ -165,33 +210,26 @@ void Logic()
         break;
     }
 
-    
-    // the border will end your game 
-    /*if (x > width || x < 0 || y > height || y < 0)
-    {
-        cout << "Game Over." << endl;
-        GameOver = true;
-    }*/
-        
-        
-    // so you can go through the borders of the map
-    if (x >= width) x = 0; else if (x < 0) x = width - 1;
-    if (y >= height) y = 0; else if (y < 0) y = height - 1;
+
     for (int i = 1; i < nTail; i++)
         if (tailX[i] == x && tailY[i] == y)
         {
+            system("cls");
             cout << "Game Over." << endl;
-            GameOver = true;  
+            cout << "Final score: " << score << endl;
+            cout << "Total Fruits: " << fruits << endl;
+            system("pause");
+            GameOver = true;
         }
-            
 
-    // randomises the fruit spawns on the map
+
     if (x == fruitX && y == fruitY)
     {
+        fruits += 1;
         score += 10;
         fruitX = rand() % width;
         fruitY = rand() % height;
-        nTail++; 
+        nTail++;
     }
 }
 
@@ -199,15 +237,49 @@ void Logic()
 // main setup and Game loop
 int main()
 {
+    cout << YELLOW << "Welcome to Snake a fun little game that anyone can play." << endl;
+    cout << "I hope you enjoy it because this took me a long time and a lot of pain. HA HA HA" << endl;
+    cout << endl << "Please select a GameMode" << endl;
+    cout << "Select '1' to play the Game with the Border on, select '2' to Play with the Border off" << RESET_COLOR << endl;
+    getline(cin, input2);
+    system("cls");
+    
+
     setup();
     while (!GameOver)
     {
         Draw();
+        UpdateFrame();
         Input();
         Logic();
 
-        // slows the game down because of faster CPU
-        Sleep(30); 
+
+        if (input2 == "1")
+        {
+            if (x + 2 > width || x < 0 || y > height || y < 0)
+            {
+                system("cls");
+                cout << "Game Over." << endl;
+                cout << "Final score: " << score << endl;
+                cout << "Total Fruits: " << fruits << endl;
+                system("pause");
+                GameOver = true;
+            }
+        }
+        else if (input2 == "2")
+        {
+            if (x + 1 >= width) x = 0; else if (x < 0) x = width - 2;
+            if (y >= height) y = 0; else if (y < 0) y = height - 1;
+        }
+        else
+        {
+            system("cls");
+            cout << "Invalid Command." << endl;
+            return 1;
+        }
+
+        // slows the game down for the people running the game with a faster CPU
+        Sleep(50);
     }
     return 0;
 }
