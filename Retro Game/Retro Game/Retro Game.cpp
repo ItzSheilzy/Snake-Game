@@ -4,6 +4,12 @@
 #include <cstdlib>
 #include <string>
 
+// Arrow key Movments
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+
 using namespace std;
 
 // Gameover Boolian
@@ -36,6 +42,42 @@ const char* RESET_COLOR = "\x1b[0m";
 
 enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN,};
 eDirecton dir;
+
+class Gamemode1
+{
+public:
+    Gamemode1();
+    ~Gamemode1();
+
+private:
+
+};
+
+Gamemode1::Gamemode1()
+{
+}
+
+Gamemode1::~Gamemode1()
+{
+}
+
+class Gamemode2
+{
+public:
+    Gamemode2();
+    ~Gamemode2();
+
+private:
+
+};
+
+Gamemode2::Gamemode2()
+{
+}
+
+Gamemode2::~Gamemode2()
+{
+}
 
 
 // setup for the game 
@@ -129,16 +171,16 @@ void Input()
     {
         switch (_getch())
         {
-        case 'a':
+        case KEY_LEFT:
             dir = LEFT;
             break;
-        case 'd':
+        case KEY_RIGHT:
             dir = RIGHT;
             break;
-        case 'w':
+        case KEY_UP:
             dir = UP;
             break;
-        case 's':
+        case KEY_DOWN:
            dir = DOWN;
             break;
         case 'p':
@@ -211,6 +253,31 @@ void Logic()
     }
 
 
+    if (input2 == "1")
+    {
+        if (x + 2 > width || x < 0 || y > height || y < 0)
+        {
+            system("cls");
+            cout << "Game Over." << endl;
+            cout << "Final score: " << score << endl;
+            cout << "Total Fruits: " << fruits << endl;
+            system("pause");
+            GameOver = true;
+        }
+    }
+    else if (input2 == "2")
+    {
+        if (x + 1 >= width) x = 0; else if (x < 0) x = width - 2;
+        if (y >= height) y = 0; else if (y < 0) y = height - 1;
+    }
+    else
+    {
+        system("cls");
+        cout << RED << "Invalid Command." << RESET_COLOR << endl;
+        GameOver = true;
+    }
+
+
     for (int i = 1; i < nTail; i++)
         if (tailX[i] == x && tailY[i] == y)
         {
@@ -239,7 +306,18 @@ int main()
 {
     cout << YELLOW << "Welcome to Snake a fun little game that anyone can play." << endl;
     cout << "I hope you enjoy it because this took me a long time and a lot of pain. HA HA HA" << endl;
-    cout << endl << "Please select a GameMode" << endl;
+    cout << endl;
+    cout << "If you haven't played snake before it is time to be cultured because EVERYONE should know" << endl << "Snake and the Rules.......Right?.........So anyways lets go over the rules and the movments." << endl;
+    system("pause");
+    cout << endl;
+    cout << "Movment UP Arrow = up, LEFT Arrow = Left DOWN Arrow = Down, RIGHT Arrow = Right, P = Pause the game." << endl <<"Literally just like anyone Game played on Computer. " << endl;
+    cout << "Rules: if you chose GameMode 1 The Border is not your friend is it out to kill you so is your Snake body if you touch" << endl << "either of those with your head guess what you die because that is how snake words" << endl;
+    cout << endl;
+    cout << "If you Chose GameMode 2 then you are in the clear of everything that wants to kill you right..... WRONG." << endl << "Your Snake body is still out there to get you and end your whole snake career so don't hit your body" << endl;
+    system("pause");
+    system("cls");
+    cout << "Anyway time to Select one of the too GameModes Wooohoooooooooo" << endl;
+    cout << endl << "Select a GameMode by pressing 1 or 2 and then press enter and lets play." << endl;
     cout << "Select '1' to play the Game with the Border on, select '2' to Play with the Border off" << RESET_COLOR << endl;
     getline(cin, input2);
     system("cls");
@@ -252,31 +330,6 @@ int main()
         UpdateFrame();
         Input();
         Logic();
-
-
-        if (input2 == "1")
-        {
-            if (x + 2 > width || x < 0 || y > height || y < 0)
-            {
-                system("cls");
-                cout << "Game Over." << endl;
-                cout << "Final score: " << score << endl;
-                cout << "Total Fruits: " << fruits << endl;
-                system("pause");
-                GameOver = true;
-            }
-        }
-        else if (input2 == "2")
-        {
-            if (x + 1 >= width) x = 0; else if (x < 0) x = width - 2;
-            if (y >= height) y = 0; else if (y < 0) y = height - 1;
-        }
-        else
-        {
-            system("cls");
-            cout << "Invalid Command." << endl;
-            return 1;
-        }
 
         // slows the game down for the people running the game with a faster CPU
         Sleep(50);
