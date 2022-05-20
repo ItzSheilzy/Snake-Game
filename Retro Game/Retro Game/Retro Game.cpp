@@ -3,35 +3,41 @@
 #include <windows.h>
 #include <cstdlib>
 #include <string>
+using namespace std;
 
-// Arrow key Movments
+
+//Arrow key Movments
 #define KEY_UP 72
 #define KEY_DOWN 80
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 
-using namespace std;
 
-// Gameover Boolian
+//Gameover Boolian
 bool GameOver;
 
-// world border size 
-const int width = 40;
-const int height = 20;
 
-// x,y and score ints of the Snake and Fruit
+//World border size 
+const int width = 25;
+const int height = 15;
+
+
+//x,y and score ints of the Snake and Fruit
 int x, y, fruitX, fruitY, score , fruits;
 
-// Tail ints
+//const int MAX_RAND = width % height;
+
+//Tail ints
 int tailX[100], tailY[100];
 int nTail;
+
 
 //User Inputs there are more then 2 so the code doesn't break and mess up the game 
 string input1 = " ";
 string input2 = " ";
 
 
-//Colours to make the game look pretty
+//Colours to make the game look pretty and also has a colour reset
 const char* MAGENTA = "\x1b[95m";
 const char* RED = "\x1b[91m";
 const char* GREEN = "\x1b[92m";
@@ -39,48 +45,12 @@ const char* YELLOW = "\x1b[93m";
 const char* WHITE = "\x1b[97m";
 const char* RESET_COLOR = "\x1b[0m";
 
-
+ 
 enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN,};
 eDirecton dir;
 
-class Gamemode1
-{
-public:
-    Gamemode1();
-    ~Gamemode1();
 
-private:
-
-};
-
-Gamemode1::Gamemode1()
-{
-}
-
-Gamemode1::~Gamemode1()
-{
-}
-
-class Gamemode2
-{
-public:
-    Gamemode2();
-    ~Gamemode2();
-
-private:
-
-};
-
-Gamemode2::Gamemode2()
-{
-}
-
-Gamemode2::~Gamemode2()
-{
-}
-
-
-// setup for the game 
+//Setup for the game 
 void setup()
 {
     GameOver = false;
@@ -94,34 +64,34 @@ void setup()
 }
 
 
-// Draw function
+//Draw function
 void Draw()
 {
-    // Top of the map
+    //Top of the map
     for (int i = 0; i < width + 1; i++)
     {
         cout << RED << "#";
     } 
     cout << endl;
 
-    // Array the prints the world border aswell as the snake head and fruit inside the border map
+    //Array the prints the world border aswell as the snake head and fruit inside the border map
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
             if (j == 0 || j == width - 1)
             {
-                cout << RED << "#"; // World border
+                cout << RED << "#"; //World border
             }
             if(i == y && j == x)
             {
-                cout << GREEN << "O"; // Snake head
+                cout << GREEN << "O"; //Snake head
             }
             else if (i == fruitY && j == fruitX)
             {
-                cout << WHITE << "F"; // Fruit
+                cout << WHITE << "F"; //Fruit
             }
-            // prints the body if the snake on the back of the snake head
+            //Prints the body if the snake on the back of the snake head
             else
             {
                 bool print = false;
@@ -130,45 +100,46 @@ void Draw()
                     
                     if (tailX[k] == j && tailY[k] == i)
                     {
-                        cout << GREEN << "o"; 
+                        cout << GREEN << "o"; //Snake body
                         print = true;
                     }
                 } 
-                // printing blank spaces in the sized map
+                //Printing blank spaces in the sized map
                 if (!print)
                     cout << " ";
-                
             }
         }
         cout << endl;
     }
-    // bottom of the map
+    //Bottom of the map
     for (int i = 0; i < width + 1; i++)
     {
         cout << RED << "#";
     }
+
     cout << RESET_COLOR << endl;
-    // Score display
+    //Score and fruit display
     cout << "Score: " << score << endl;
     cout << "Fruits collected: " << fruits << endl;
 }
 
 
-// makes the frames not flicker when you open the the game
+//Makes the frames not flicker when you open the the game
 void UpdateFrame()
 {
-    COORD cursorPosition;	
+    COORD cursorPosition{};	
     cursorPosition.X = 0;	
     cursorPosition.Y = 0;	
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
 
 
-// Movment controls of the snake
+//Movment controls of the snake
 void Input()
 {
     if (_kbhit())
     {
+        //Arrow key Movments
         switch (_getch())
         {
         case KEY_LEFT:
@@ -183,6 +154,22 @@ void Input()
         case KEY_DOWN:
            dir = DOWN;
             break;
+
+        //WASD Movments
+        case 'a':
+            dir = LEFT;
+            break;
+        case 'd':
+            dir = RIGHT;
+            break;
+        case 'w':
+            dir = UP;
+            break;
+        case 's':
+            dir = DOWN;
+            break;
+
+        //Pause function
         case 'p':
             system("cls");
             cout << "Game Paused." << endl;
@@ -233,6 +220,7 @@ void Logic()
         prevX = prev2X;
         prevY = prev2Y;
     }
+
     // direction of the snake 
     switch (dir)
     {
@@ -252,9 +240,11 @@ void Logic()
         break;
     }
 
-
+    //GameMode Choice input detecter so if it dectects the user type and enter 1 or 2 it will assign and play that Gamemode.
+    //if it dectects a invalid input command it will end the program  
     if (input2 == "1")
     {
+        
         if (x + 2 > width || x < 0 || y > height || y < 0)
         {
             system("cls");
@@ -267,6 +257,7 @@ void Logic()
     }
     else if (input2 == "2")
     {
+        
         if (x + 1 >= width) x = 0; else if (x < 0) x = width - 2;
         if (y >= height) y = 0; else if (y < 0) y = height - 1;
     }
@@ -276,7 +267,6 @@ void Logic()
         cout << RED << "Invalid Command." << RESET_COLOR << endl;
         GameOver = true;
     }
-
 
     for (int i = 1; i < nTail; i++)
         if (tailX[i] == x && tailY[i] == y)
@@ -289,7 +279,7 @@ void Logic()
             GameOver = true;
         }
 
-
+    //Random fruit position Generator
     if (x == fruitX && y == fruitY)
     {
         fruits += 1;
@@ -301,16 +291,16 @@ void Logic()
 }
 
 
-// main setup and Game loop
 int main()
 {
+    //Main Menu
     cout << YELLOW << "Welcome to Snake a fun little game that anyone can play." << endl;
     cout << "I hope you enjoy it because this took me a long time and a lot of pain. HA HA HA" << endl;
     cout << endl;
     cout << "If you haven't played snake before it is time to be cultured because EVERYONE should know" << endl << "Snake and the Rules.......Right?.........So anyways lets go over the rules and the movments." << endl;
     system("pause");
     cout << endl;
-    cout << "Movment UP Arrow = up, LEFT Arrow = Left DOWN Arrow = Down, RIGHT Arrow = Right, P = Pause the game." << endl <<"Literally just like anyone Game played on Computer. " << endl;
+    cout << "Movment UP Arrow or W = up, LEFT Arrow or A = Left, DOWN Arrow or S = Down, RIGHT Arrow or D = Right, P = Pause the game." << endl <<"Literally just like anyone Game played on Computer. " << endl;
     cout << "Rules: if you chose GameMode 1 The Border is not your friend is it out to kill you so is your Snake body if you touch" << endl << "either of those with your head guess what you die because that is how snake words" << endl;
     cout << endl;
     cout << "If you Chose GameMode 2 then you are in the clear of everything that wants to kill you right..... WRONG." << endl << "Your Snake body is still out there to get you and end your whole snake career so don't hit your body" << endl;
@@ -322,7 +312,7 @@ int main()
     getline(cin, input2);
     system("cls");
     
-
+    //Main Game Loop
     setup();
     while (!GameOver)
     {
@@ -331,8 +321,8 @@ int main()
         Input();
         Logic();
 
-        // slows the game down for the people running the game with a faster CPU
-        Sleep(50);
+        //Slows the game down for the people running the game with a faster CPU
+        Sleep(70);
     }
     return 0;
 }
